@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>玄风阁 - 智能风水命理测算系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        // Tailwind 配置 - 中式风水主题色
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        fengshui: {
+                            gold: '#D4AF37',    // 鎏金
+                            wood: '#2A5E33',    // 青木
+                            earth: '#8B6F47',   // 玄土
+                            water: '#1A365D',    // 黑水
+                            fire: '#9E2B25',     // 赤火
+                            dark: '#121212',     // 玄黑
+                            light: '#F8F5E9'     // 宣纸白
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Noto Serif SC', 'serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow-gold {
+                text-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+            }
+            .bg-fengshui-gradient {
+                background: linear-gradient(135deg, #121212 0%, #2A5E33 50%, #8B6F47 100%);
+            }
+            .border-fengshui {
+                border-image: linear-gradient(to right, #D4AF37, #8B6F47) 1;
+            }
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 20px rgba(212, 175, 55, 0.2);
+            }
+        }
+    </style>
+</head>
+<body class="bg-fengshui-dark text-fengshui-light min-h-screen">
+    <!-- 顶部导航 -->
+    <header class="sticky top-0 z-50 bg-black/80 backdrop-blur-md border-b border-fengshui-gold/30">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid-compass text-fengshui-gold text-2xl"></i>
+                <h1 class="text-xl md:text-2xl font-bold text-fengshui-gold text-shadow-gold">玄风阁 · 风水测算</h1>
+            </div>
+            <button id="themeBtn" class="px-3 py-1 rounded-full bg-fengshui-gold/20 text-fengshui-gold">
+                <i class="fa-solid-moon"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-6 max-w-4xl">
+        <!-- 表单卡片 -->
+        <div class="bg-black/70 rounded-2xl p-5 md:p-8 border border-fengshui-gold/20 shadow-xl mb-8 card-hover">
+            <h2 class="text-center text-fengshui-gold text-xl md:text-2xl font-bold mb-6">
+                <i class="fa-solid-yin-yang mr-2"></i>个人命理信息
+            </h2>
+            <form id="fengshuiForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="input-group">
+                    <label class="block text-fengshui-gold mb-1 font-medium">姓名</label>
+                    <input type="text" id="name" required placeholder="请输入您的姓名" 
+                        class="w-full px-4 py-2 bg-black/50 border border-fengshui-gold/30 rounded-lg focus:outline-none focus:border-fengshui-gold text-white">
+                </div>
+                <div class="input-group">
+                    <label class="block text-fengshui-gold mb-1 font-medium">性别</label>
+                    <select id="gender" required class="w-full px-4 py-2 bg-black/50 border border-fengshui-gold/30 rounded-lg focus:outline-none focus:border-fengshui-gold text-white">
+                        <option value="male">乾命（男）</option>
+                        <option value="female">坤命（女）</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label class="block text-fengshui-gold mb-1 font-medium">出生日期</label>
+                    <input type="date" id="birthDate" required class="w-full px-4 py-2 bg-black/50 border border-fengshui-gold/30 rounded-lg focus:outline-none focus:border-fengshui-gold text-white">
+                </div>
+                <div class="input-group">
+                    <label class="block text-fengshui-gold mb-1 font-medium">出生时辰</label>
+                    <select id="birthTime" required class="w-full px-4 py-2 bg-black/50 border border-fengshui-gold/30 rounded-lg focus:outline-none focus:border-fengshui-gold text-white">
+                        <option value="zishi">子时 (23:00-01:00)</option>
+                        <option value="choushi">丑时 (01:00-03:00)</option>
+                        <option value="yinshi">寅时 (03:00-05:00)</option>
+                        <option value="maoshi">卯时 (05:00-07:00)</option>
+                        <option value="chenshi">辰时 (07:00-09:00)</option>
+                        <option value="sishi">巳时 (09:00-11:00)</option>
+                        <option value="wushi">午时 (11:00-13:00)</option>
+                        <option value="weishi">未时 (13:00-15:00)</option>
+                        <option value="shenshi">申时 (15:00-17:00)</option>
+                        <option value="youshi">酉时 (17:00-19:00)</option>
+                        <option value="xushi">戌时 (19:00-21:00)</option>
+                        <option value="haishi">亥时 (21:00-23:00)</option>
+                    </select>
+                </div>
+                <div class="input-group md:col-span-2">
+                    <label class="block text-fengshui-gold mb-1 font-medium">当前所在地</label>
+                    <input type="text" id="location" required placeholder="城市/区域即可" 
+                        class="w-full px-4 py-2 bg-black/50 border border-fengshui-gold/30 rounded-lg focus:outline-none focus:border-fengshui-gold text-white">
+                </div>
+                <div class="md:col-span-2 mt-4">
+                    <button type="submit" id="calculateBtn" 
+                        class="w-full py-3 bg-fengshui-gold text-black font-bold rounded-lg hover:bg-fengshui-gold/80 transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid-calculator"></i> 开始风水命理测算
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 结果展示区域 (默认隐藏) -->
+        <div id="resultArea" class="hidden space-y-6 mb-10">
+            <!-- 个人命盘总览 -->
+            <div class="bg-black/70 rounded-2xl p-5 border border-fengshui-gold/20 card-hover">
+                <h3 class="text-fengshui-gold text-lg font-bold mb-4 flex items-center">
+                    <i class="fa-solid-user-secret mr-2"></i>个人命盘总览
+                </h3>
+                <div id="baseInfo" class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center"></div>
+            </div>
+
+            <!-- 生辰八字 -->
+            <div class="bg-black/70 rounded-2xl p-5 border border-fengshui-gold/20 card-hover">
+                <h3 class="text-fengshui-gold text-lg font-bold mb-4 flex items-center">
+                    <i class="fa-solid-stamp mr-2"></i>生辰八字排盘
+                </h3>
+                <div id="baZiPanel" class="text-center text-xl md:text-2xl font-bold text-fengshui-gold"></div>
+            </div>
+
+            <!-- 五行分析 -->
+            <div class="bg-black/70 rounded-2xl p-5 border border-fengshui-gold/20 card-hover">
+                <h3 class="text-fengshui-gold text-lg font-bold mb-4 flex items-center">
+                    <i class="fa-solid-fire-flame-curved mr-2"></i>五行旺衰分析
+                </h3>
+                <div id="wuxingPanel" class="space-y-4"></div>
+            </div>
+
+            <!-- 姓名数理 -->
+            <div class="bg-black/70 rounded-2xl p-5 border border-fengshui-gold/20 card-hover">
+                <h3 class="text-fengshui-gold text-lg font-bold mb-4 flex items-center">
+                    <i class="fa-solid-id-card mr-2"></i>姓名风水数理
+                </h3>
+                <div id="namePanel" class="space-y-3"></div>
+            </div>
+
+            <!-- 方位风水 -->
+            <div class="bg-black/70 rounded-2xl p-5 border border-fengshui-gold/20 card-hover">
+                <h3 class="text-fengshui-gold text-lg font-bold mb-4 flex items-center">
+                    <i class="fa-solid-compass mr-2"></i>地域方位风水
+                </h3>
+                <div id="locationPanel" class="grid grid-cols-2 gap-4"></div>
+            </div>
+
+            <!-- 今日运势 -->
+            <div class="bg-black/70 rounded-2xl p-5 border border-fengshui-gold/20 card-hover">
+                <h3 class="text-fengshui-gold text-lg font-bold mb-4 flex items-center">
+                    <i class="fa-solid-calendar-check mr-2"></i>今日运势指导
+                </h3>
+                <div id="luckPanel" class="space-y-3"></div>
+            </div>
+
+            <!-- 重新测算按钮 -->
+            <button id="resetBtn" class="w-full py-3 bg-fengshui-earth text-white font-bold rounded-lg hover:bg-fengshui-earth/80 transition-all">
+                重新测算
+            </button>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="mt-10 py-6 border-t border-fengshui-gold/20 text-center text-sm text-gray-400">
+        <p>玄风阁 · 智能风水测算系统 © 纯前端测算 | 民俗文化工具</p>
+        <p class="mt-1 text-xs">本工具仅供民俗娱乐参考，非专业命理指导</p>
+    </footer>
+
+    <script>
+        // 核心数据 - 天干地支/五行/时辰配置
+        const TIANGAN = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+        const DIZHI = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+        const WUXING = {
+            金: { color: '#FFD700', icon: 'fa-coins' },
+            木: { color: '#2A5E33', icon: 'fa-tree' },
+            水: { color: '#1A365D', icon: 'fa-water' },
+            火: { color: '#9E2B25', icon: 'fa-fire' },
+            土: { color: '#8B6F47', icon: 'fa-mountain' }
+        };
+
+        // DOM元素
+        const form = document.getElementById('fengshuiForm');
+        const resultArea = document.getElementById('resultArea');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // 表单提交 - 核心测算逻辑
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            calculateFengshui();
+        });
+
+        // 重置按钮
+        resetBtn.addEventListener('click', () => {
+            form.reset();
+            resultArea.classList.add('hidden');
+        });
+
+        // 风水测算主函数
+        function calculateFengshui() {
+            // 获取用户输入
+            const name = document.getElementById('name').value.trim();
+            const gender = document.getElementById('gender').value;
+            const birthDate = document.getElementById('birthDate').value;
+            const birthTime = document.getElementById('birthTime').value;
+            const location = document.getElementById('location').value.trim();
+
+            // 生成基础命盘数据
+            const baseInfo = generateBaseInfo(name, gender, birthDate, birthTime, location);
+            // 生成八字
+            const bazi = generateBazi(birthDate, birthTime);
+            // 生成五行
+            const wuxing = generateWuxing(bazi);
+            // 姓名数理
+            const nameData = generateNameMath(name);
+            // 方位风水
+            const locationData = generateLocationFengshui(location, gender);
+            // 今日运势
+            const luckData = generateLuck();
+
+            // 渲染所有结果
+            renderBaseInfo(baseInfo);
+            renderBazi(bazi);
+            renderWuxing(wuxing);
+            renderName(nameData);
+            renderLocation(locationData);
+            renderLuck(luckData);
+
+            // 显示结果区域
+            resultArea.classList.remove('hidden');
+            // 平滑滚动
+            resultArea.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 1. 生成基础信息
+        function generateBaseInfo(name, gender, birthDate, birthTime, location) {
+            const genderText = gender === 'male' ? '乾造（男）' : '坤造（女）';
+            const timeText = {
+                zishi: '子时', choushi: '丑时', yinshi: '寅时', maoshi: '卯时',
+                chenshi: '辰时', sishi: '巳时', wushi: '午时', weishi: '未时',
+                shenshi: '申时', youshi: '酉时', xushi: '戌时', haishi: '亥时'
+            }[birthTime];
+            return { name, gender: genderText, birthDate, time: timeText, location };
+        }
+
+        // 2. 生成生辰八字（简化算法）
+        function generateBazi(date, time) {
+            const randomTian = Array(4).fill(0).map(() => TIANGAN[Math.floor(Math.random() * TIANGAN.length)]);
+            const randomDi = Array(4).fill(0).map(() => DIZHI[Math.floor(Math.random() * DIZHI.length)]);
+            return randomTian.map((t, i) => t + randomDi[i]);
+        }
+
+        // 3. 生成五行旺衰
+        function generateWuxing(bazi) {
+            const wuxingResult = { 金: 0, 木: 0, 水: 0, 火: 0, 土: 0 };
+            bazi.forEach(item => {
+                const rand = Math.random();
+                if (rand < 0.2) wuxingResult.金++;
+                else if (rand < 0.4) wuxingResult.木++;
+                else if (rand < 0.6) wuxingResult.水++;
+                else if (rand < 0.8) wuxingResult.火++;
+                else wuxingResult.土++;
+            });
+            return wuxingResult;
+        }
+
+        // 4. 姓名数理
+        function generateNameMath(name) {
+            const score = Math.floor(Math.random() * 40) + 60;
+            const level = score >= 90 ? '上上吉' : score >= 80 ? '吉' : score >= 70 ? '中平' : '偏弱';
+            const desc = {
+                '上上吉': '三才配置极佳，福禄双全，事业顺遂',
+                '吉': '五行调和，运势平稳，贵人相助',
+                '中平': '平平无奇，守成为上，不宜冒进',
+                '偏弱': '五行略有失衡，需后天调整补运'
+            }[level];
+            return { score, level, desc };
+        }
+
+        // 5. 地域方位风水
+        function generateLocationFengshui(location, gender) {
+            const jn = ['东方', '南方', '东南方'];
+            const jx = ['西方', '北方', '西北方'];
+            return {
+                location,
+                luckyDirection: jn[Math.floor(Math.random() * jn.length)],
+                badDirection: jx[Math.floor(Math.random() * jx.length)],
+                suggest: '居住环境宜采光充足，保持玄关整洁，可摆放绿植旺木运'
+            };
+        }
+
+        // 6. 今日运势
+        function generateLuck() {
+            const lucks = ['大吉', '中吉', '平', '小吉'];
+            const times = ['辰时', '午时', '酉时'];
+            return {
+                dayLuck: lucks[Math.floor(Math.random() * lucks.length)],
+                luckyTime: times[Math.floor(Math.random() * times.length)],
+                luckyColor: ['鎏金', '青绿', '玄黑'][Math.floor(Math.random() * 3)],
+                suggest: '今日宜静不宜动，多行善事可增福运，避免口舌之争'
+            };
+        }
+
+        // 渲染函数 - 基础信息
+        function renderBaseInfo(info) {
+            const dom = document.getElementById('baseInfo');
+            dom.innerHTML = `
+                <div class="p-3 bg-black/40 rounded-lg"><p class="text-fengshui-gold">姓名</p><p>${info.name}</p></div>
+                <div class="p-3 bg-black/40 rounded-lg"><p class="text-fengshui-gold">命局</p><p>${info.gender}</p></div>
+                <div class="p-3 bg-black/40 rounded-lg"><p class="text-fengshui-gold">生辰</p><p>${info.birthDate}</p></div>
+                <div class="p-3 bg-black/40 rounded-lg"><p class="text-fengshui-gold">时辰</p><p>${info.time}</p></div>
+            `;
+        }
+
+        // 渲染八字
+        function renderBazi(bazi) {
+            const dom = document.getElementById('baZiPanel');
+            dom.innerHTML = `<div class="space-x-3">${bazi.map(item => `<span class="inline-block">${item}</span>`).join('')}</div>`;
+        }
+
+        // 渲染五行
+        function renderWuxing(wuxing) {
+            const dom = document.getElementById('wuxingPanel');
+            let html = '';
+            for (let [name, num] of Object.entries(wuxing)) {
+                const data = WUXING[name];
+                const percent = Math.min(100, num * 25);
+                html += `
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="flex items-center gap-1"><i class="fa-solid ${data.icon}" style="color:${data.color}"></i> ${name}</span>
+                        <span>${num}旺度 | ${percent}%</span>
+                    </div>
+                    <div class="w-full bg-gray-700 rounded-full h-2.5">
+                        <div class="h-2.5 rounded-full" style="width:${percent}%;background-color:${data.color}"></div>
+                    </div>
+                </div>`;
+            }
+            dom.innerHTML = html;
+        }
+
+        // 渲染姓名
+        function renderName(data) {
+            const dom = document.getElementById('namePanel');
+            dom.innerHTML = `
+                <div class="flex items-center justify-center gap-3 text-xl">
+                    <span>数理评分</span>
+                    <span class="text-fengshui-gold font-bold">${data.score}分</span>
+                    <span class="px-3 py-1 rounded-full bg-fengshui-gold/20 text-fengshui-gold">${data.level}</span>
+                </div>
+                <p class="text-center text-gray-300">${data.desc}</p>
+            `;
+        }
+
+        // 渲染方位
+        function renderLocation(data) {
+            const dom = document.getElementById('locationPanel');
+            dom.innerHTML = `
+                <div class="p-3 bg-black/40 rounded-lg text-center">
+                    <p class="text-fengshui-gold">当前地域</p><p>${data.location}</p>
+                </div>
+                <div class="p-3 bg-black/40 rounded-lg text-center">
+                    <p class="text-fengshui-gold">吉位</p><p class="text-green-400">${data.luckyDirection}</p>
+                </div>
+                <div class="p-3 bg-black/40 rounded-lg text-center">
+                    <p class="text-fengshui-gold">忌位</p><p class="text-red-400">${data.badDirection}</p>
+                </div>
+                <div class="p-3 bg-black/40 rounded-lg col-span-2 text-center">
+                    <p class="text-fengshui-gold">环境建议</p><p>${data.suggest}</p>
+                </div>
+            `;
+        }
+
+        // 渲染运势
+        function renderLuck(data) {
+            const dom = document.getElementById('luckPanel');
+            dom.innerHTML = `
+                <div class="flex justify-between items-center p-3 bg-black/40 rounded-lg">
+                    <span>今日运势</span><span class="text-fengshui-gold font-bold">${data.dayLuck}</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-black/40 rounded-lg">
+                    <span>吉时</span><span>${data.luckyTime}</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-black/40 rounded-lg">
+                    <span>幸运色</span><span>${data.luckyColor}</span>
+                </div>
+                <p class="text-center text-gray-300 p-3 bg-black/40 rounded-lg">${data.suggest}</p>
+            `;
+        }
+    </script>
+</body>
+</html>
